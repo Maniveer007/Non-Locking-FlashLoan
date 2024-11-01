@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./home.css";
-import YourAssets from "../Components/YourAssets";
-import YourLoans from "../Components/YourLoans";
+import LiquidityProviders from "../Components/LiquidityProviders";
 
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -12,6 +11,9 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useWeb3 } from "../api/contextApi";
 import { ethers } from "ethers";
+
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
   const [activeComponent, setActiveComponent] = useState("Component1");
@@ -24,7 +26,6 @@ const Home = () => {
     contract,
     setContract,
   } = useWeb3();
-  const [isUploading, setIsUploading] = useState(false);
   const [amount, setAmmount] = useState("");
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
@@ -121,10 +122,12 @@ const Home = () => {
 
   const handleBorrowFormSubmit = async (e) => {
     e.preventDefault();
-    // requestFlashLoan
 
     if (borrowAmount > totalLiquidity) {
-      alert("We don't have enough resource");
+      toast.error(`We don't have enough resource`, {
+        position: "top-right",
+        theme: "dark",
+      });
     }
 
     console.log(recipientAddress, borrowAmount * 10 ** 6);
@@ -166,6 +169,7 @@ const Home = () => {
 
   return (
     <div className="home_container">
+      <ToastContainer />
       <div className="home_container_upper">
         <h2>${totalLiquidity}</h2>
         <p>USDC</p>
@@ -195,7 +199,7 @@ const Home = () => {
           </div>
 
           <div className="home_container_lower_datas">
-            <YourAssets data={liqProvidersArray} />
+            <LiquidityProviders data={liqProvidersArray} />
           </div>
 
           <div className="fixed-buttons-container">
@@ -242,9 +246,7 @@ const Home = () => {
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button type="submit" disabled={isUploading}>
-                  {isUploading ? "Uploading..." : "Upload"}
-                </Button>
+                <Button type="submit">Deposit </Button>
               </DialogActions>
             </form>
           </Dialog>
@@ -294,9 +296,7 @@ const Home = () => {
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose2}>Cancel</Button>
-                <Button type="submit" disabled={isUploading}>
-                  {isUploading ? "Uploading..." : "Upload"}
-                </Button>
+                <Button type="submit">Borrow</Button>
               </DialogActions>
             </form>
           </Dialog>

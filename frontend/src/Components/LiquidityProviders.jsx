@@ -1,6 +1,6 @@
 import React from "react";
 import usdc from "../images/usdc.png";
-import "./YourAssets.css";
+import "./LiquidityProviders.css";
 import { ethers } from "ethers";
 
 const YourAssets = ({ data }) => {

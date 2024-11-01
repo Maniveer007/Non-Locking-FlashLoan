@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./home.css";
 import YourAssets from "../Components/YourAssets";
 import YourLoans from "../Components/YourLoans";
@@ -10,14 +10,29 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useWeb3 } from "../api/contextApi";
+import { ethers } from "ethers";
 
 const Home = () => {
   const [activeComponent, setActiveComponent] = useState("Component1");
-
+  const {
+    account,
+    setAccount,
+    provider,
+    setProvider,
+    USDCcontract,
+    contract,
+    setContract,
+  } = useWeb3();
   const [isUploading, setIsUploading] = useState(false);
   const [amount, setAmmount] = useState("");
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
+  const [totalLiquidity, setTotalLiquidity] = useState("");
+  const [yourLiquidity, setYourLiquidity] = useState("");
+  const [recipientAddress, setRecipientAddress] = useState("");
+  const [borrowAmount, setBorrowAmount] = useState("");
+  const [liqProvidersArray, setLiqProviderArray] = useState([]);
 
   const handleClick = (component) => {
     setActiveComponent(component);
@@ -39,28 +54,133 @@ const Home = () => {
     setOpen2(false);
   };
 
-  const handleFormSubmit = () => {};
+  const getTotalBalance = async () => {
+    const totBalance = await contract?.reserves();
+    console.log(totBalance);
+
+    const integerValue = ethers.utils.formatUnits(totBalance, 6);
+
+    setTotalLiquidity(integerValue);
+  };
+
+  const userLiquidity = async () => {
+    const userLiquidityIndex = await contract?.userLPindex(account);
+    const integerValue = ethers.utils.formatUnits(userLiquidityIndex, "wei");
+    console.log(integerValue);
+
+    const temp = await contract?.liquidityProviders(integerValue);
+
+    const intFirst = ethers.utils.formatUnits(temp[1], 6);
+    const intSecond = ethers.utils.formatUnits(temp[2], 6);
+
+    const minNumber = Math.min(intFirst, intSecond);
+    setYourLiquidity(minNumber);
+  };
+
+  const getLiquidityProvider = async () => {
+    const results = [];
+
+    for (let index = 1; index < 1000; index++) {
+      try {
+        const temp = await contract?.liquidityProviders(index);
+        results.push(temp);
+      } catch (error) {
+        console.error(`Error at index ${index}: ${error.message}`);
+        console.log("Results before error:", results);
+        setLiqProviderArray(results);
+        return;
+      }
+    }
+
+    setLiqProviderArray(results);
+    return;
+  };
+
+  const balance = async () => {
+    try {
+      console.log(account);
+      console.log(contract);
+      const balanceOF = await USDCcontract.balanceOf(account);
+      console.log("balanceOF", balanceOF);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    contract && balance();
+    contract && getTotalBalance();
+    contract && userLiquidity();
+    contract && getLiquidityProvider();
+  }, [account]);
+
+  const handleMaxFunction = (e) => {
+    e.preventDefault();
+    setAmmount("MAX Amount");
+  };
+
+  const handleBorrowFormSubmit = async (e) => {
+    e.preventDefault();
+    // requestFlashLoan
+
+    if (borrowAmount > totalLiquidity) {
+      alert("We don't have enough resource");
+    }
+
+    console.log(recipientAddress, borrowAmount * 10 ** 6);
+
+    const reqFlashLoan = await contract?.requestFlashLoan(
+      recipientAddress,
+      borrowAmount * 10 ** 6
+    );
+
+    console.log(reqFlashLoan);
+  };
+
+  const handleDepositFormSubmit = async (e) => {
+    e.preventDefault();
+    if (amount === "MAX Amount") {
+      let ammountuint256 = ethers.BigNumber.from(
+        "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+      )?.toString();
+      console.log(ammountuint256);
+
+      const approve = await USDCcontract.approve(
+        contract?.address,
+        ammountuint256
+      );
+      console.log(approve);
+    } else {
+      let ammountuint256 = ethers.BigNumber.from(amount)
+        .mul(ethers.BigNumber.from(10).pow(6))
+        .toString();
+      const approve = await USDCcontract.approve(
+        contract?.address,
+        ammountuint256
+      );
+      console.log(ammountuint256);
+      console.log(approve);
+    }
+    handleClose();
+  };
 
   return (
     <div className="home_container">
       <div className="home_container_upper">
-        <h2>
-          $88421.
-          <span>21</span>
-        </h2>
-        <p>~ 3.69 ETH</p>
+        <h2>${totalLiquidity}</h2>
+        <p>USDC</p>
       </div>
 
       <div className="home_bottom_container">
         <div className="home_container_middle">
           <div className="home_container_middle_left">
-            <p>Collateral</p>
-            <p>$8824.21</p>
+            <p>Total Liquidity</p>
+            <p>${totalLiquidity}</p>
           </div>
           <div className="home_container_middle_middle"></div>
           <div className="home_container_middle_right">
-            <p>Borrowed</p>
-            <p>$8824.21</p>
+            <p>Your Liquidity</p>
+            <p>${yourLiquidity}</p>
           </div>
         </div>
 
@@ -70,19 +190,12 @@ const Home = () => {
               onClick={() => handleClick("Component1")}
               className={`${activeComponent === "Component1" ? "active" : ""}`}
             >
-              Your assets
-            </div>
-            <div
-              onClick={() => handleClick("Component2")}
-              className={`${activeComponent === "Component2" ? "active" : ""}`}
-            >
-              Your loans
+              Liquidity Providers
             </div>
           </div>
 
           <div className="home_container_lower_datas">
-            {activeComponent === "Component1" && <YourAssets />}
-            {activeComponent === "Component2" && <YourLoans />}
+            <YourAssets data={liqProvidersArray} />
           </div>
 
           <div className="fixed-buttons-container">
@@ -104,11 +217,11 @@ const Home = () => {
               },
             }}
           >
-            <form onSubmit={handleFormSubmit}>
-              <DialogTitle>Upload NFT</DialogTitle>
+            <form onSubmit={handleDepositFormSubmit}>
+              <DialogTitle>Give Liquidity just by approval</DialogTitle>
               <DialogContent>
                 <DialogContentText>
-                  Please fill out the form to upload your NFT.
+                  Provide amount you want to give as liquidity.
                 </DialogContentText>
                 <div className="input_contianer">
                   <TextField
@@ -123,7 +236,9 @@ const Home = () => {
                     variant="standard"
                   />
                 </div>
-                <button className="max-button">Max</button>
+                <button className="max-button" onClick={handleMaxFunction}>
+                  Max
+                </button>
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
@@ -144,22 +259,23 @@ const Home = () => {
               },
             }}
           >
-            <form onSubmit={handleFormSubmit}>
-              <DialogTitle>Upload NFT</DialogTitle>
+            <form onSubmit={handleBorrowFormSubmit}>
+              <DialogTitle>Borrow Liquidity </DialogTitle>
               <DialogContent>
                 <DialogContentText>
-                  Please fill out the form to upload your NFT.
+                  Provide flash loan recipient address, which follow our flash
+                  loan interface
                 </DialogContentText>
                 <div className="input_contianer">
                   <TextField
                     autoFocus
                     required
                     margin="dense"
-                    label="Amount"
+                    label="Recipient Address"
                     type="text"
                     fullWidth
-                    value={amount}
-                    onChange={(e) => setAmmount(e.target.value)}
+                    value={recipientAddress}
+                    onChange={(e) => setRecipientAddress(e.target.value)}
                     variant="standard"
                   />
 
@@ -170,8 +286,8 @@ const Home = () => {
                     label="Amount"
                     type="text"
                     fullWidth
-                    value={amount}
-                    onChange={(e) => setAmmount(e.target.value)}
+                    value={borrowAmount}
+                    onChange={(e) => setBorrowAmount(e.target.value)}
                     variant="standard"
                   />
                 </div>

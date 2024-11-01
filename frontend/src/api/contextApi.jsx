@@ -1,17 +1,20 @@
 import { ethers } from "ethers";
 import React, { createContext, useState, useContext, useEffect } from "react";
-// import thetaVidContract from "../contract/abi";
-
+import erc20ABI from "../abi/Erc20";
+import FlashLoanABI from "../abi/FlashLoanABI";
 const Web3Context = createContext();
 
 export const Web3provider = ({ children }) => {
   const [account, setAccount] = useState("");
+  const [USDCcontract, setUSDCcontract] = useState(null);
   const [contract, setContract] = useState(null);
   const [provider, setProvider] = useState(null);
 
+  // console.log(erc20ABI);
+
   useEffect(() => {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const loadProvider = async () => {
         if (provider) {
           await provider.send("eth_requestAccounts");
@@ -35,16 +38,25 @@ export const Web3provider = ({ children }) => {
           }
 
           setAccount(address);
-          //   let contractAddress = "0xecFBc22B04Efc8f071443cB8ec54f4f13177B7Fa";
+          let USDCcontractAddress =
+            "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8";
+          const USDCcontract = new ethers.Contract(
+            USDCcontractAddress,
+            erc20ABI,
+            signer
+          );
 
-          //   const contract = new ethers.Contract(
-          //     contractAddress,
-          //     thetaVidContract,
-          //     signer
-          //   );
-
-          //   setContract(contract);
+          setUSDCcontract(USDCcontract);
           setProvider(provider);
+
+          let contractAddress = "0xa3F7120830896699304A5481255eF5199Fcf2091";
+          const contract = new ethers.Contract(
+            contractAddress,
+            FlashLoanABI,
+            signer
+          );
+
+          setContract(contract);
         } else {
           alert("Metamask not installed");
         }
@@ -62,6 +74,7 @@ export const Web3provider = ({ children }) => {
         setAccount,
         provider,
         setProvider,
+        USDCcontract,
         contract,
         setContract,
       }}

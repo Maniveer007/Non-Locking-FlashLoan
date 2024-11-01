@@ -1,35 +1,39 @@
 import React from "react";
-import temp from "../images/temp.png";
+import usdc from "../images/usdc.png";
 import "./YourAssets.css";
+import { ethers } from "ethers";
 
-const YourAssets = () => {
+const YourAssets = ({ data }) => {
   return (
     <div className="YourAssets_container">
-      <div className="YourAssets_container_data">
-        <div className="YourAssets_container_data_left">
-          <img src={temp}></img>
-          <div className="YourAssets_container_data_left_right">
-            <h2>DAI in Aave</h2>
-            <p>2.27% APY</p>
+      {data?.map((k, index) => {
+        return (
+          <div className="YourAssets_container_data" key={index}>
+            <div className="YourAssets_container_data_left">
+              <img src={usdc}></img>
+              <div className="YourAssets_container_data_left_right">
+                <h2>
+                  {k[0]
+                    ? `${k[0]?.slice(0, 6)}...${k[0]?.slice(
+                        k[0].length - 4,
+                        k[0].length
+                      )}`
+                    : " "}
+                </h2>
+              </div>
+            </div>
+            <div className="YourAssets_container_data_right">
+              <p>
+                {Math.min(
+                  ethers.utils.formatUnits(k[1], 6),
+                  ethers.utils.formatUnits(k[2], 6)
+                )}{" "}
+                USDC
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="YourAssets_container_data_right">
-          <p>4042.2129124</p>
-        </div>
-      </div>
-
-      <div className="YourAssets_container_data">
-        <div className="YourAssets_container_data_left">
-          <img src={temp}></img>
-          <div className="YourAssets_container_data_left_right">
-            <h2>DAI in Aave</h2>
-            <p>2.27% APY</p>
-          </div>
-        </div>
-        <div className="YourAssets_container_data_right">
-          <p>4042.2129124</p>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 };

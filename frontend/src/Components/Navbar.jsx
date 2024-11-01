@@ -1,17 +1,12 @@
-import React, { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
 import "./navbar.css";
-import { useEffect } from "react";
-import { ethers } from "ethers";
-
-// import {
-//   ConnectKitProvider,
-//   ConnectKitButton,
-//   getDefaultConfig,
-// } from "connectkit";
-// import logo from "../images/logo.png";
+import { useWeb3 } from "../api/contextApi";
 
 const Navbar = () => {
+  const { account, setAccount, provider, setProvider, contract, setContract } =
+    useWeb3();
+
   return (
     <div className="gpt3__navbar">
       <div className="gpt3__navbar-links">
@@ -29,13 +24,12 @@ const Navbar = () => {
           className="navbar_my_nft_button_add"
           // onClick={loadAddress}
         >
-          {/* {account
+          {account
             ? `${account?.slice(0, 6)}...${account?.slice(
                 account.length - 4,
                 account.length
               )}`
-            : "Connect wallet"} */}
-          connect wallet
+            : "Connect wallet"}
         </button>
       </div>
     </div>

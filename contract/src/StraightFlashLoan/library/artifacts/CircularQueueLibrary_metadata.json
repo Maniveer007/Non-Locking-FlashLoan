@@ -1,0 +1,112 @@
+{
+	"compiler": {
+		"version": "0.8.28+commit.7893614a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"components": [
+							{
+								"components": [
+									{
+										"internalType": "address",
+										"name": "user",
+										"type": "address"
+									},
+									{
+										"internalType": "uint256",
+										"name": "balance",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "allowance",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct IReactiveFlashLoan.LP[]",
+								"name": "LPs",
+								"type": "tuple[]"
+							},
+							{
+								"internalType": "uint256",
+								"name": "currentPointer",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct IReactiveFlashLoan.CircularQueue",
+						"name": "queue",
+						"type": "tuple"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "getNextPointerforAmount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"src/demos/FlashLoan/library/CircularQueueLibrary.sol": "CircularQueueLibrary"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"src/demos/FlashLoan/interface/IReactiveFlashLoan.sol": {
+			"keccak256": "0xb72428903ce276584da9899cbc8de8f4c9276ca603bf37aa93f7d7a84f6fc36f",
+			"license": "UNLICENSED",
+			"urls": [
+				"bzz-raw://159b026bd678fe3065b729e7fe33b3da857e8e7707f165adb9d5e5adca11f6b5",
+				"dweb:/ipfs/QmWGR9Vqh37HnKUzC7f94U575Ls9zweh3iBDRAVq8GCcwW"
+			]
+		},
+		"src/demos/FlashLoan/library/CircularQueueLibrary.sol": {
+			"keccak256": "0x7a4847af77e93491c3100d9a108f7450b5f3036ce23650aff2ecf2e13c0ae1e8",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://53ed4eabfb2e255b9f7ef02a6a0f2e7249a2d6e76fd1ee53389216a920188d34",
+				"dweb:/ipfs/QmYGHNmpquhbMGW3ieybuHkJdRcVLh5BDuzhYFAxJQwouo"
+			]
+		}
+	},
+	"version": 1
+}

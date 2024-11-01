@@ -3,10 +3,6 @@
 pragma solidity >=0.8.0;
 
 interface IReactiveFlashLoan{
-    struct CircularQueue{
-        LP[] LPs;
-        uint256 currentPointer;
-    }
 
     struct LP {
         address user;

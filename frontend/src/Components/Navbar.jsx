@@ -13,7 +13,7 @@ const Navbar = () => {
         <div className="gpt3__navbar-links_logo">
           <Link to="/">
             {/* <img src={logo}></img> */}
-            AAVE
+            <h2>FlashLoan</h2>
           </Link>
         </div>
       </div>

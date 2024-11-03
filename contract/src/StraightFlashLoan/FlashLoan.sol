@@ -25,6 +25,10 @@ contract FlashLoan is AbstractCallback, IFlashLoan, IReactiveFlashLoan {
 
     receive() external payable {}
 
+
+    // the reason for this function to not have a visibility modifier is to allow the callback contract to call it
+    // and also it is not meant to be called by any other contract or user
+    // it can be called by any user which doesnt effect our business logic
     function updateUser(address /**/, address user) public  {
         uint256 balance = token.balanceOf(user);
         uint256 allowance = token.allowance(user, address(this));

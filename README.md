@@ -6,9 +6,7 @@ In traditional DeFi protocols like Aave, when users provide liquidity to the fla
 
 video tutorial : [https://www.loom.com/share/ed734581998249eb853a9cff7dce9cad?sid=c2a5d99b-b640-4c2d-bc61-05489a1209e4](https://www.loom.com/share/ed734581998249eb853a9cff7dce9cad?sid=c2a5d99b-b640-4c2d-bc61-05489a1209e4)
 
-
 deployed FlashLoan Address : [0xff8b1bba3a612e27236347cdbeff220d19028c81e1446a122cbdb224a9443223](https://sepolia.etherscan.io/tx/0xff8b1bba3a612e27236347cdbeff220d19028c81e1446a122cbdb224a9443223)
-
 
 rvm : [RVM](https://kopli.reactscan.net/rvm/0xafe08919dac82e79ae274eb94441aa2447bb13b6)
 
@@ -31,3 +29,60 @@ The core of this project lies in the reactive network’s capabilities. Unlike c
 ## How Reactive Network Empowers DeFi Efficiency
 
 The design of this protocol is guided by the philosophy that any event can be the catalyst for a transaction. When users approve, transfer, or interact with the contract, these actions are automatically reflected in the protocol’s ledger, keeping liquidity details updated in real-time. This dynamic reaction mechanism not only ensures liquidity but also empowers users to utilize their tokens across the DeFi ecosystem without sacrificing access or control.
+
+# Deployment & Testing
+
+To deploy testnet contracts to Sepolia, follow these steps, making sure you substitute the appropriate keys, addresses, and endpoints where necessary. You will need the following environment variables configured appropriately to follow this script:
+
+```
+export SEPOLIA_RPC=
+export SEPOLIA_PRIVATE_KEY=
+export REACTIVE_RPC=https://kopli-rpc.rkt.ink
+export REACTIVE_PRIVATE_KEY=
+export SYSTEM_CONTRACT_ADDR=0x0000000000000000000000000000000000FFFFFF
+export CALLBACK_SENDER_ADDR=0x33Bbb7D0a2F1029550B0e91f653c4055DC9F4Dd8
+export USER_PUBLIC_KEY=
+export TOKEN_ADDRESS=
+```
+
+If the user does not have a predefined token, deploy a token contract on the Sepolia network. This token will be used in the flash loan contract.
+
+```
+forge create --rpc-url $SEPOLIA_RPC --private-key $SEPOLIA_PRIVATE_KEY src/StraightFlashLoan/token.sol:Token --legacy
+```
+
+Output: Assign the deployed token address to TOKEN_ADDRESS:
+
+```
+export TOKEN_ADDRESS=
+```
+
+Once the token is deployed, mint tokens to the user's address.
+
+```
+cast send $TOKEN_ADDRESS "mint(address,uint256)" $USER_PUBLIC_KEY 1000000000000000000  --rpc-url $SEPOLIA_RPC --private-key $SEPOLIA_PRIVATE_KEY --legacy
+```
+
+Deploy the FlashLoan contract, providing the token address and the callback sender address.
+
+```
+forge create --rpc-url $SEPOLIA_RPC --private-key $SEPOLIA_PRIVATE_KEY src/StraightFlashLoan/FlashLoan.sol:FlashLoan --constructor-args $TOKEN_ADDRESS $CALLBACK_SENDER_ADDR --value 0.01ether  --legacy
+```
+
+Output: Assign the deployed flash loan contract address to FLASHLOAN_ADDR:
+
+```
+export FLASHLOAN_ADDR=
+```
+
+Deploy the ReactiveFlashLoan contract, configured to monitor liquidity providers. This contract will be set up to listen for events and manage liquidity updates.
+
+```
+forge create --rpc-url $REACTIVE_RPC --private-key $REACTIVE_PRIVATE_KEY src/StraightFlashLoan/ReactiveFlashLoan.sol:ReactiveFlashLoan --constructor-args $SYSTEM_CONTRACT_ADDR $FLASHLOAN_ADDR $TOKEN_ADDRESS  --legacy
+```
+
+Approve the FlashLoan contract to access the tokens, enabling it to use liquidity from the user's token balance.
+
+```
+cast send $TOKEN_ADDRESS "approve(address,uint256)" $FLASHLOAN_ADDR 1000000000000000000  --rpc-url $SEPOLIA_RPC --private-key $SEPOLIA_PRIVATE_KEY --legacy
+```

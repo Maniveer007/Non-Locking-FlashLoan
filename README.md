@@ -4,6 +4,9 @@
 
 In traditional DeFi protocols like Aave, when users provide liquidity to the flash loan pool, their assets are staked and represented by receipt tokens. However, these staked assets remain locked, limiting their usability. Users effectively hold tokens in a pool, unable to fully leverage their value or liquidity potential. Our project, the **Non-Locking FlashLoan Protocol**, introduces a novel solution using a reactive network to address these limitations and enhance asset liquidity.
 
+video tutorial : [https://www.loom.com/share/ed734581998249eb853a9cff7dce9cad?sid=c2a5d99b-b640-4c2d-bc61-05489a1209e4](https://www.loom.com/share/ed734581998249eb853a9cff7dce9cad?sid=c2a5d99b-b640-4c2d-bc61-05489a1209e4)
+deployed FlashLoan Address : [0xff8b1bba3a612e27236347cdbeff220d19028c81e1446a122cbdb224a9443223](https://sepolia.etherscan.io/tx/0xff8b1bba3a612e27236347cdbeff220d19028c81e1446a122cbdb224a9443223)
+
 ## Key Innovation: Reactive Network in DeFi
 
 The core of this project lies in the reactive network’s capabilities. Unlike conventional cross-chain read-then-transaction approaches, our use of the reactive network makes it possible to trigger automatic, on-chain actions in response to specific events. This event-driven framework enables transactions to occur based on predefined conditions without holding assets locked in a pool, giving users dynamic control over their funds.
